@@ -1,5 +1,5 @@
 # Tutorial for Spatial Autocorrelation Analysis in R 
-This tutorial uses Global Moran’s I and Local Interpretation of Spatial Autocorrelation (LISA) testing methods to determine the spatial correlation between median total income and percent French speakers in Kelowna, British Columbia. 
+This tutorial uses Global Moran’s I and Local Interpretation of Spatial Autocorrelation (LISA) testing methods to determine the spatial correlation between median total income and percent French speaking population in Kelowna, British Columbia. 
 
 ## Introduction
   Spatial autocorrelation is a spatial analyisis technique that allows us to determine whether a variable is distributed randomly (no correlation), clustered (positive correlation), or dispersed (negative correlation). This technique involves calculating the variance between values for a varible at location (I) and values at neighboring locations (J), and applying a weighted matrix to determine the influence of nearby observations on eachother. This tutorial uses Global Moran’s I and Local Interpretation of Spatial Autocorrelation (LISA) tests to determine the spatial correlation between Median Income and Percent French Knowledge Speakers in Kelowna, British Columbia. 
