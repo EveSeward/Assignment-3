@@ -2,11 +2,12 @@
 This tutorial uses Global Moran’s I and Local Interpretation of Spatial Autocorrelation (LISA) testing methods to determine the spatial correlation between median total income and percent French speaking population in Kelowna, British Columbia. 
 
 ## Introduction
-  Spatial autocorrelation is a spatial analyisis technique that allows us to determine whether a variable is distributed randomly (no correlation), clustered (positive correlation), or dispersed (negative correlation). This technique involves calculating the variance between values for a varible at location (I) and values at neighboring locations (J), and applying a weighted matrix to determine the influence of nearby observations on eachother. This tutorial uses Global Moran’s I and Local Interpretation of Spatial Autocorrelation (LISA) tests to determine the spatial correlation between Median Income and Percent French Knowledge Speakers in Kelowna, British Columbia. 
+Spatial autocorrelation is a spatial analysis technique that allows us to determine whether an observation is distributed randomly (no correlation), clustered (positive correlation), or dispersed (negative correlation). Global Moran's I is a measures spatial association based on location and value simultaneousy (ESRI, 2024), giving us a generalized inferential statistic. Local Moran's I or LISA, compares values and locations within the context of all neighbouring values, providing a comprehensive statistic describing 'hotspots' and significant outliers (ESRI, 2024). Spatial Autocorrelation is preffered over other measures of spatial association as it accounts for Tobler's Law, which states that nearby observations are not independant, and more often than not will influence observations at neighbouring locations (source).
 
-The data used in this analysis were accesses from Statistics Canada Open Government Portal (2016), consisting of a shapefile containing the census boundaries of multiple Canadian cities in a multi-polygon format, and a comma separated value (csv) file containing census data. Census data is most often used for spatial analysis as it provides data to work with on multiple spatial and temporal scales, making it useful for both autocorrelation and time-series analyses (source). By comparing the two census variables in used in this tutorial we look to gain a deeper understanding of the relationships between French culture and socioeconomic status in our study area. These relationships are important from a census context as they manifest in access to resources, public policy, policing, and locations of high density immigrant populations (Statistics Canada, 2014).
+### Data 
+The data used in this analysis was accesses from Statistics Canada Open Government Portal (2016), consisting of a shapefile containing the census boundaries of multiple Canadian cities in a multi-polygon format, and an excel spreadhseet (csv) file containing census data. Census data is most often used for spatial analysis as it provides data to work with on multiple spatial and temporal scales, making it useful for both autocorrelation and time-series analyses (source). By comparing the two census variables in used in this tutorial we look to gain a deeper understanding of the relationships between French culture and socioeconomic status in our study area. These relationships are important from a census context as they manifest in access to resources, public policy, policing, and locations of high density immigrant populations (Statistics Canada, 2014).
 
-## Packages & Libraries
+### Packages & Libraries
 
 One of the best things about using R is that we can access a variety of open-source code packages to help us execute 
 a multitude of tasks For example, the tmap package allows us to access functions to create maps that visualize our spatial data (Tennekes et. Al, 2023), spdep allows us to calculate spatial staistics (Bivand et.al, 2009), and the knitr package allows us to embed R code within a pdf, html, or word document output (Yihuei Xie, 2001-2024). With a better sense for how packages expand our capabilities in R, we can now begin by installing the necessary packages and calling them from our package library using the ‘library’ function. Whenever we install a new package in R it will be saved to our package library, so we must simply use the 'library' function to access them at anytime.
@@ -126,10 +127,12 @@ data <- data.frame(Variable = c("Income", "French Language"),
 #Print table 
 kable(data, caption = paste0("Descriptive statistics for selected ", 2016, " census variables"))
 ```
+![1](https://github.com/user-attachments/assets/4c95be6d-4efb-4ded-bbd0-4cd3ecf0a33e)
+
 
 ### Step 7: Map variables of interest
 
-The first step in mapping our variables of interest is by creating two ‘map objects’ called map_Income, and map_French. We use the function tm_shape to tell R what variable we are mapping and the function tm_polygons to customize the parameters for our map design elements. Next, we will print the maps side by side for comparison, using the function ‘tmap_arrange’. The code and output maps for median total income and percentage of population with French knowledge are shown below: 
+The first step in mapping our variables of interest is by creating two ‘map objects’ called map_Income, and map_French. We use the 'tmap' package to access our mapping functions. For example, tm_shape to tell R what variable we are mapping and the function tm_polygons to customize the parameters for our map design elements. Next, we will print the maps side by side for comparison, using the function ‘tmap_arrange’. The code and output maps for median total income and percentage of population with French knowledge are shown below: 
 
 ```{r StudyArea, echo=TRUE, eval=TRUE, warning=FALSE, fig.cap="City of Vancouver census dissemination areas showing median total income (left) and percentage of respondants with knowledge of french (right)."}
 
@@ -157,13 +160,9 @@ map_French <- tm_shape(French_noNA) +
 tmap_arrange(map_Income, map_French, ncol = 2, nrow = 1)
 
 ```
+<img width="1000" alt="Rplot02" src="https://github.com/user-attachments/assets/2048fd60-6fb6-4f5d-9dec-06d819d9f199">
 
-### Step 8: Create a Weighted Neighbourhood Matrix
-
-Ec
-x
-pl
-im
+### Step 8: Calculate Queen and Rook weights
 
 ```{r Neighbours, echo=TRUE, eval=TRUE, warning=FALSE}
 #Income Neighbours - Queens weight
@@ -207,6 +206,8 @@ IncomeBoth <- tm_shape(Income_noNA) + tm_borders(col='lightgrey') +
 #Print maps in a three pane figure
 tmap_arrange(IncomeQueen, IncomeRook, IncomeBoth, ncol = 3, nrow = 1)
 ```
+<img width="1000" alt="Rplot04" src="https://github.com/user-attachments/assets/39771e49-ba9d-428f-a578-229e5975573d">
+
 We'll do the same thing for french knowlege speakers
 
 ``` {r Neighboursmap2, echo=TRUE, eval=TRUE, warning=FALSE, fig.cap="Kelowna census dissemination areas showing percent french knowledge speakers queens weight (left)  rooks weight (middle) and the combination of the two (right)."}
@@ -225,18 +226,18 @@ FrenchBoth <- tm_shape(French_noNA) + tm_borders(col='lightgrey') +
 
 #Print maps in a three pane figure
 tmap_arrange(FrenchQueen, FrenchRook, FrenchBoth, ncol = 3, nrow = 1)
-
 ```
+<img width="1000" alt="Rplot03" src="https://github.com/user-attachments/assets/698148d9-2cb0-4378-b8d7-1be7cfd032c4">
 
+### Step 10: Create a weights matrix
 Describe the code for the weighted matrix file.
+By creating a weighted neighbourhood matrix we are essentially finding a deviation fron from the mean
 
 Weights are defined by “style” (ie. type), and can include “B”, “W”, and “C”. The B weights matrix is the most basic of the three, as it employs a binary weighting scheme, whereby each neighbour is given a weight of 1, and all other polygons are given a weight of 0 (see figures above). A W weights matrix employs a row standardized weighting scheme, with each neighbour given equal weights that sum to 1 [11]. Comparatively, a C weights matrix is a globally standardized method of weighting, with all neighbours given equal weight across the entire study area [13].
 
-Creating a weights matrix in R uses the “nb2listw” function from the “spdep” library. We can apply this function to the vri.nb variable created above, as it contains all of the neighbour links to which we want to assign weights. Additionally, if there are any polygons in our file with zero neighbour links, we still want the program to run. Therefore, we define “zero.policy” as equal to “TRUE”, which assigns weights vectors of zero length for regions with no neighbours [13]. Subsequently, we can print off our list of weights matrices (“print.listw”) in order to assess the distribution of weights for each observation (i) and its neighbours (j). The example of code below is using a weights matrix of type W. You can read more about the different styles of spatial weighting [here](https://r-spatial.github.io/spdep/reference/nb2listw.html).
+Creating a weights matrix in R uses the “nb2listw” function from the “spdep” library. We can apply this function to the vri.nb variable created above, as it contains all of the neighbour links to which we want to assign weights. Additionally, if there are any polygons in our file with zero neighbour links, we still want the program to run. Therefore, we define “zero.policy” as equal to “TRUE”, which assigns weights vectors of zero length for regions with no neighbours [13]. Subsequently, we can print off our list of weights matrices (“print.listw”) in order to assess the distribution of weights for each observation (i) and its neighbours (j). The example of code below is using a weights matrix of type W. You can read more about the different styles of spatial weighting [here](https://r-spatial.github.io/spdep/reference/nb2listw.html
 
-
-```{r Final weights, echo=TRUE, eval=TRUE, warning=FALSE}
-
+```{r Final weights, echo=TRUE, eval=TRUE, warning=FALSE}.
 #Create Income weights matrix
 Income.lw <- nb2listw(Income.nb, zero.policy = TRUE, style = "W")
 
@@ -385,6 +386,7 @@ map_LISA_French <- tm_shape(French_noNA) +
 #Plot maps in a 2 pane figure
 tmap_arrange(map_LISA_Income, map_LISA_French, ncol = 2, nrow = 1)
 ```
+![Rplot05](https://github.com/user-attachments/assets/1f0840c1-7bca-4874-80da-3704d3cf244c)
 
 Explain the results.
 
