@@ -321,7 +321,7 @@ maxRange2 <- range[2]
 
 The purpose of calculating the range of Moran's I values gives us an idea of what values we might see for perfectly dispersed and clustered distributions for both median total income an percent French knowledge speakers. These ranges give us an idea of where our calculated Moran's I values fall within the entire range of values accross the dataset, allowing us to determine the pattern of spatial distribution and the kind of spatial autocorrelation (positive or negative) that exists between the two variables.
 
-To go one step further, we can determine whether or not these spatial patterns are statistically significant. To do this, we use the Z-test. Here our null hypothesis is that values for median total income and percent French knowledge speakers are randomly distributed, and the alternate hypothesis is that they are not randomly distributed. Using an $\alpha$ value of 0.05 (95% confidence interval), if our Z-score falls above or below 1.96, we can determine wether we reject or accept the null hypothesis. A value greater than +1.96 would imply that our results are not randomly distributed (reject the null hypothesis), and a value less than -1.96 would imply that our results are randomly distributed (accept the null hypothesis).
+To go one step further, we can determine whether or not these spatial patterns are statistically significant. To do this, we use the Z-test. Here our null hypothesis is that values for median total income and percent French knowledge speakers are randomly distributed, and the alternate hypothesis is that they are not randomly distributed. Using an $\alpha$ value of 0.05 (95% confidence interval), if our Z-score falls above or below +/-1.96, we can reject the null hypothesis. A value greater than +1.96 would imply that our variables are significantly clustered, and a value less than -1.96 would imply that they are significanlty dispersed.
 
 We can calculate a Z-test using the following code:
 
@@ -344,14 +344,14 @@ The zscores for both variables confirm that we can reject the null hypothesis fo
 
 ## Local Moran's I
 
-Local Moran's I or LISA, is different from Global Moran's I in that it provides us with a statistic for each location with an assessment of significance (source). The main difference between the two is that instead of providing single measures of Moran's I, expected I, variance, and z-score, LISA provides us with these statistics for every single location (i) in the dataset.
+Local Moran's I or LISA, is different from Global Moran's I in that it provides us with a statistic for each location with an assessment of significance (Anselin, 2020). The main difference between the two is that instead of providing single measures of Moran's I, expected I, variance, and z-score, LISA provides us with these statistics for every single location (i) in the dataset.
 
 The calculation for Local Moran’s I has many of the same features as the global calculation, although arranged differently.
 $$
 I_i = \frac{x_i - \bar{x}}{S_i^2}\sum{_{j=1}^n}W_{i,j}(x_j - \bar{x})\space \space where \space \space S_i^2 = \frac{\sum_{i=1}^n (x_i - \bar{x})^2}{n-1} 
 $$
 
-Again, instead of typing out these calculations, we'll use the "localmoran()" function from the "spdep" package library and input our variables and weighting scheme.
+Again, instead of typing out these calculations, we'll use the "localmoran()" function from the "spdep" package library and input our variables and weighting scheme. This process is shown in the code below:
 
 ```{r Local Morans I, echo=TRUE, eval=TRUE, warning=FALSE}
 #Calculate LISA test for Income
@@ -374,7 +374,7 @@ French_noNA$Var.Ii<- lisa.testFrench [,3]
 French_noNA$Z.Ii<- lisa.testFrench [,4]
 French_noNA$P<- lisa.testFrench [,5]
 ```
-Instead of printing out a table, we'll go back to the basic mapping template so we can visualize the results to understand what this test has done.
+This time, instead of printing out a table we'll create a map so we can visualize the results and understand what this test has done.
 
 ```{r MappingLocalMoransI, echo=TRUE, eval=TRUE, warning=FALSE, fig.cap="Kelowna census dissemination areas showing LISA z-scores for median total income (left) and percentage of respondants with knowledge of french (right)."}
 #Map LISA z-scores for Income
@@ -412,7 +412,7 @@ tmap_arrange(map_LISA_Income, map_LISA_French, ncol = 2, nrow = 1)
 
 Figure 4. Kelowna census dissemination areas showing LISA z-scores for median total income (left) and percentage of respondents with French knowledge (right).
 
-While these maps are great for visualizing where the data is and getting a rough idea of how many polygons are significantly positively or negatively spatially autocorrelated, it will be even more informative to graph the Local Moran's I Z-values. This process is shown in the code below where we'll use the function "moran.plot()" from the "spdep" package libary to create scatterplote .
+The above map shows that there are census tracts in Kelowna that exhibit signifificant distribution patterns for both median total income and percent French knowledge speakers. The red polygons represent tracts that exhibit significant clustering, and the blue polygons represent area of significant disperion. Although these maps are great for visualizing which polygons in our study area are significantly positively or negatively spatially autocorrelated, it will be even more informative if we graph the Local Moran's I Z-values. This process is shown in the code below where we'll use the function "moran.plot()" from the "spdep" package libary to create scatterplot.
 
 ```{r MoransIScatter, echo=TRUE, eval=TRUE, warning=FALSE, fig.cap= "Moran's I scatter plot for median total income."}
 #Create Moran's I scatter plot for Income
@@ -424,14 +424,12 @@ moran.plot(Income_noNA$`Median total income`, Income.lw, zero.policy=TRUE, spChk
 moran.plot(French_noNA$PercFrench, French.lw, zero.policy=TRUE, spChk=NULL, labels=NULL, xlab="Respondants with knowledge of French (%)", 
            ylab="Spatially Lagged knowledge of French (%)", quiet=NULL)
 ```
-In these plots, the points with diamonds are considered statistically significant, and the regression line shows the overall trend. For both plots we can see that the trend shows?
-
-
+In these plots, the points with diamonds are considered statistically significant, and the regression line shows the overall trend. For both plots we can see that the trend shows 
 
 
 ## Summary
 
-Provide a brief summary.
+This tutorial provides a basic introduction to spatial autocorrelation in R. However, although the results of the Global and Local Moran's I tests provide valuable insights into the spatial distributions of our variables of interest, there are still oppportunites to refine our results. One key observation is that census tracts increase in size from the centre of the region, which should be considered in our weighting scheme. For example, switching from a binary contiguity scheme to "B" to a more complex scheme such as IDW could reduce the influence of distant neighbours on smaller, high population density census tracts. Additionaly, the Local Moran's I Z-score map shows significant clustering in these smaller tracts, suggesting a need to facotr in population density in future analyses. Conducting, a Global and Local Moran's I tests for population density could help to furthur refine our results. In short, suggested improvements include, experimenting with alternative weighting schemes and scaling the results to a mesure of population density.
 
 ## References
 Miller, H. J. (2004). Tobler’s First Law and Spatial Analysis. Annals of the Association of American Geographers, 94(2), 284–289. http://www.jstor.org/stable/3693985 
