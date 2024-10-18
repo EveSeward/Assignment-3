@@ -1,16 +1,16 @@
 # Tutorial for Spatial Autocorrelation Analysis in R 
-This tutorial uses Global Moran’s I and Local Interpretation of Spatial Autocorrelation (LISA) testing methods to determine the spatial correlation between median total income and percent French speaking population in Kelowna, British Columbia. 
+This tutorial uses Global Moran’s I and Local Interpretation of Spatial Autocorrelation (LISA) testing methods to determine the spatial correlation between median total income and percent French knowledge speakers in Kelowna, British Columbia. 
 
 ## Introduction
-Spatial autocorrelation is a spatial analysis technique that allows us to determine whether an observation is distributed randomly (no correlation), clustered (positive correlation), or dispersed (negative correlation). Global Moran's I is a measures spatial association based on location and value simultaneousy (ESRI, 2024), giving us a generalized inferential statistic. Local Moran's I or LISA, compares values and locations within the context of all neighbouring values, providing a comprehensive statistic describing 'hotspots' and significant outliers (ESRI, 2024). Spatial Autocorrelation is preffered over other measures of spatial association as it accounts for Tobler's Law, which states that nearby observations are not independant, and more often than not will influence observations at neighbouring locations (source).
+Spatial autocorrelation is a spatial analysis technique that allows us to determine whether an observation is positively correlated (nearby observations have similar values) or negatively correlated (near things have dissimilar values). This gives us an idea of the spatial distribution of the dataset indicating whether observations are distributed randomly, clustered, or dispersed. Global Moran's I is a measures spatial association based on location and value simultaneousy, giving us a generalized inferential statistic. Local Moran's I or LISA, compares values and locations within the context of all neighbouring values, providing a comprehensive statistic describing 'hotspots' and significant outliers. In each of these tests we will examine how similar or dissimilar a point (I) is from its neighbouring locations (J).  Spatial Autocorrelation is preferred over other measures of spatial association as it accounts for Tobler's Law, which states that observations are not independent and will influenced by observations at nearby locations (Miller H.J., 2004).
 
 ### Data 
-The data used in this analysis was accesses from Statistics Canada Open Government Portal (2016), consisting of a shapefile containing the census boundaries of multiple Canadian cities in a multi-polygon format, and an excel spreadhseet (csv) file containing census data. Census data is most often used for spatial analysis as it provides data to work with on multiple spatial and temporal scales, making it useful for both autocorrelation and time-series analyses (source). By comparing the two census variables in used in this tutorial we look to gain a deeper understanding of the relationships between French culture and socioeconomic status in our study area. These relationships are important from a census context as they manifest in access to resources, public policy, policing, and locations of high density immigrant populations (Statistics Canada, 2014).
+The data for this analysis was obtained from the Statistics Canada Open Government Portal (2016), consisting of a shapefile containing the census boundaries of multiple Canadian cities in a multi-polygon format, and a CSV file with census data. Census data is widely used in spatial analysis as it provides us with a large amount of data about population demographics, socioeconomics, and other key population factors for the regions where it is collected. In this tutorial we compare medain total income with percent French knowledge speakers to explore the relationships between French culture and socioeconomic status in our study area. These relationships are important from a census context as they influence access to resources, public policy, policing, and locations of high density immigrant populations (Statistics Canada, 2014).
 
 ### Packages & Libraries
 
 One of the best things about using R is that we can access a variety of open-source code packages to help us execute 
-a multitude of tasks For example, the tmap package allows us to access functions to create maps that visualize our spatial data (Tennekes et. Al, 2023), spdep allows us to calculate spatial staistics (Bivand et.al, 2009), and the knitr package allows us to embed R code within a pdf, html, or word document output (Yihuei Xie, 2001-2024). With a better sense for how packages expand our capabilities in R, we can now begin by installing the necessary packages and calling them from our package library using the ‘library’ function. Whenever we install a new package in R it will be saved to our package library, so we must simply use the 'library' function to access them at anytime.
+a multitude of tasks. For example, the "tmap" package library allows us to access functions to create maps that visualize our spatial data (Tennekes et. Al, 2023), "spdep" allows us to calculate spatial staistics (Bivand et.al, 2020), and "knitr" allows us to embed R code within a pdf, html, or word document output (Yihuei Xie, 2001-2024). With a better sense for how packages expand our capabilities in R, we can now begin by installing the necessary packages and calling them from our package library using the "library()" function. Whenever we install a new package in R it will be saved to our package library, so we must simply use the "library()" function to access them at anytime. Provided below are the necessary packages for spatial autocorrelation analysis:
 
 ``` {r Libraries, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
 install.packages("st")
@@ -34,7 +34,7 @@ library("shinyjs")
 ## Analysis
 ### Step 1: Creating a working directory
 
-Before starting our spatial analysis, we need to create a working directory to pull our data from. The working directory is the folder containing the census and shapefiles we downloaded onto our desktop. The assignment operator <- is used to assign the file path to our data to the object ‘dir’, which tells R where to access and read the data. To set the working directory we use the function setwd(dir). At any point, we can verify the current working directory using the function get(wd).
+Before starting our spatial analysis, we need to create a working directory to pull our data from. The working directory is the folder containing the census and shapefiles we downloaded onto our desktop. The assignment operator "<-" is used to assign the file path to our data to the object "dir", which tells R where to access and read the data. To set the working directory we use the function "setwd(dir)". At any point, we can verify the current working directory using the function "get(wd)".
 
 ```{r working directory, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
 dir <- "C:/Users/Eve/OneDrive/Assignment 3"
@@ -55,7 +55,7 @@ shp <- st_read("C:/Users/Eve/OneDrive/Assignment 3/lda_000b16a_e.shp")
 ```
 ### Step 3: Data cleanup
 
-Next, we’ll want to clean up the census data to make it easier to work with. This is done by renaming the columns so that we know what attributes they refer to and applying the new column names to the census data frame. This is a necessary step as the census data downloaded for this analysis does not contain specific column names. GEO UID stands for geographic unique identifier, which is a code assigned to the geographic areas in our census data set. The shapefile equivalent of GEO UID is the DA UID (dissemination area unique identifier), which in our dataset consists of 8 characters. To maintain consistency between the two geographic identifiers we must remove any ID’s with less than 8 characters from our census data frame. This process, and the process for renaming the csv columns is shown in the code below: 
+Next, we’ll want to clean up the census data to make it easier to work with. A simple way to do this is by applying new column names to the census data frame  so that we know what attributes they refer to. "GEO UID" stands for geographic unique identifier, which is a code assigned to the geographic areas in our census data set. The shapefile equivalent of GEO UID is the "DA UID" (dissemination area unique identifier), which in our dataset consists of eight characters. To maintain consistency between the two geographic identifiers we must remove any ID’s with less than eight characters from our census data frame. This process, and the process for renaming the csv columns is shown in the code below: 
 
 ```{r change columns, echo=TRUE, eval=TRUE, warning=FALSE}
 #New column names
@@ -76,7 +76,7 @@ csv_clean <- subset(csv, csv$len == 8)
 ```
 ### Step 4: Merge spatial and aspatial data
 
-The relationship between GEOUID and DAUID is shown in the code below, where we will use the merge function to combine our aspatial (census data) and spatial (shape file) together into one data frame called "census_DAs".
+The relationship between "GEOUID" and "DAUID" is shown in the code below, where we will use the "merge" function to combine our aspatial (census data) and spatial (shape file) together into one data frame called "census_DAs".
 
 ```{r merge data, echo=TRUE, eval=TRUE, warning=FALSE}
 #Merge spatial and aspatial data
@@ -87,7 +87,7 @@ census_DAs <- merge(shp, csv_clean,
 ```
 ### Step 5: Subset variables to the study area and remove NA values
 
-Next we will want to subset our data to include only the census data applicable to the study area, which in this case is Kelowna. This process produces a new data frame containing the subset data called "Municp". Then we will create a new variable called 'PercFrench' in our Municp data frame based on the rate between french knowledge and language sample size, as shown in the code below. Also, to maintain accuracy in our results, any missing data in the form of 0 or NA values must be removed. This will make sure that the polygons we are interested in will contain values for our variables of interest.  
+Next we will want to subset our data to include only the census data applicable to the study area, which in this case is Kelowna. This process produces a new data frame containing the subset data called "Municp". Then we will create a new variable called "PercFrench" in our "Municp" data frame based on the rate between french knowledge and language sample size, as shown in the code below. To maintain accuracy in our results, any missing data in the form of 0 or NA values must be removed. This will make sure that the polygons we are interested in will contain values for our variables of interest.  
 
 ```{r subset data, echo=TRUE, eval=TRUE, warning=FALSE}
 #Subset for Vancouver
@@ -120,21 +120,21 @@ stdevFrench <- sd(French_noNA$PercFrench)
 skewFrench <- skewness(French_noNA$PercFrench)
 
 #Create dataframe for display in table
-data <- data.frame(Variable = c("Income", "French Language"),
+data1 <- data.frame(Variable = c("Income", "French Language"),
                    Mean = c(round(meanIncome,2), round(meanFrench,2)),
                    Std.Dev = c(round(stdevIncome,2), round(stdevFrench,2)),
                    Skewness = c(round(skewIncome,2), round(skewFrench,2)))
-#Print table 
-kable(data, caption = paste0("Descriptive statistics for selected ", 2016, " census variables"))
+#produce table 
+kable(data1, caption = paste0("Descriptive statistics for selected ", 2016, " census variables"))
 ```
-![1](https://github.com/user-attachments/assets/4c95be6d-4efb-4ded-bbd0-4cd3ecf0a33e)
+<img width="1000" alt="table1" src="https://github.com/user-attachments/assets/a54a5582-09a9-473b-a4ac-72ec23714446">
 
 
 ### Step 7: Map variables of interest
 
-The first step in mapping our variables of interest is by creating two ‘map objects’ called map_Income, and map_French. We use the 'tmap' package to access our mapping functions. For example, tm_shape to tell R what variable we are mapping and the function tm_polygons to customize the parameters for our map design elements. Next, we will print the maps side by side for comparison, using the function ‘tmap_arrange’. The code and output maps for median total income and percentage of population with French knowledge are shown below: 
+The first step in mapping our variables of interest is by creating two ‘map objects’ called map_Income, and map_French. We use the "tmap" package to access our mapping functions. For example, "tm_shape" to tell R what variable we are mapping and the function "tm_polygons" to customize the parameters for our map design elements. Next, we will print the maps side by side for comparison, using the function "tmap_arrange". The code and output maps for median total income and percentage of population with French knowledge are shown below: 
 
-```{r StudyArea, echo=TRUE, eval=TRUE, warning=FALSE, fig.cap="City of Vancouver census dissemination areas showing median total income (left) and percentage of respondants with knowledge of french (right)."}
+```{r StudyArea, echo=TRUE, eval=TRUE, warning=FALSE, fig.cap="City of Kelowna census dissemination areas showing median total income (left) and percentage of respondants with knowledge of french (right)."}
 
 #Map median Income
 map_Income <- tm_shape(Income_noNA) + 
@@ -161,8 +161,11 @@ tmap_arrange(map_Income, map_French, ncol = 2, nrow = 1)
 
 ```
 <img width="1000" alt="Rplot02" src="https://github.com/user-attachments/assets/2048fd60-6fb6-4f5d-9dec-06d819d9f199">
+Figure 1. City of Kelowna census dissemination areas showing median total income (left) and percentage of respondants with knowledge of french (right).
 
 ### Step 8: Calculate Queen and Rook weights
+
+In order to calulate Moran's I, we need to define which locations fall within our neighbourhood. We'll use the Queen weighting scheme to define another neighbourhood as the eight neighbouring polygons located vertically, horizontally, and diagonally from our main point (I). Then we will use the Rook weighting scheme to define a neighbourhood as the four neighbouring plygons located vertically and horizontally from our main point (I). By selecting these neighbourhoods, we can compare how either might affect our results. From this comparison, we can decide which is most sutiable for our analysis.
 
 ```{r Neighbours, echo=TRUE, eval=TRUE, warning=FALSE}
 #Income Neighbours - Queens weight
@@ -189,6 +192,8 @@ crs(French.net2) <- crs(French_noNA)
 ```
 ### Step 9: Mapping weighted neighbourhoods
 
+Next, we will visualize the weighted neighbourhood links for the Rook and Queen weighting schemes for both median total income and percent French speaking population by superimposing them onto our study area. In the figures below, we can see that the Queens weighting scheme provides more neighbourhood links than the Rook scheme, thereby capturing a broader range of spatial relationships. This is in part due to the fact that the Rook scheme only connects with polygons that share a direct edge border, whereas the Queen scheme considers polygons that share both edge and corner borders.
+
 ```{r Neighboursmap, echo=TRUE, eval=TRUE, warning=FALSE, fig.cap="Kelowna census dissemination areas showing median total income neighbours queens weight (left)  rooks weight (middle) and the combination of the two (right)."}
 #Make queens map
 IncomeQueen <- tm_shape(Income_noNA) + tm_borders(col='lightgrey') + 
@@ -207,8 +212,9 @@ IncomeBoth <- tm_shape(Income_noNA) + tm_borders(col='lightgrey') +
 tmap_arrange(IncomeQueen, IncomeRook, IncomeBoth, ncol = 3, nrow = 1)
 ```
 <img width="1000" alt="Rplot04" src="https://github.com/user-attachments/assets/39771e49-ba9d-428f-a578-229e5975573d">
+Figure 2. Kelowna census dissemination areas showing median total income queens weight (left)  rooks weight (middle) and the combination of the two (right)
 
-We'll do the same thing for french knowlege speakers
+We'll do the same thing for percent French knowledge speakers: 
 
 ``` {r Neighboursmap2, echo=TRUE, eval=TRUE, warning=FALSE, fig.cap="Kelowna census dissemination areas showing percent french knowledge speakers queens weight (left)  rooks weight (middle) and the combination of the two (right)."}
 #Make queens map french
@@ -228,41 +234,42 @@ FrenchBoth <- tm_shape(French_noNA) + tm_borders(col='lightgrey') +
 tmap_arrange(FrenchQueen, FrenchRook, FrenchBoth, ncol = 3, nrow = 1)
 ```
 <img width="1000" alt="Rplot03" src="https://github.com/user-attachments/assets/698148d9-2cb0-4378-b8d7-1be7cfd032c4">
+Figure 3. Kelowna census dissemination areas showing percent French knowledge speakers queens weight (left)  rooks weight (middle) and the combination of the two (right)
 
 ### Step 10: Create a weights matrix
-Describe the code for the weighted matrix file.
-By creating a weighted neighbourhood matrix we are essentially finding a deviation fron from the mean
 
-Weights are defined by “style” (ie. type), and can include “B”, “W”, and “C”. The B weights matrix is the most basic of the three, as it employs a binary weighting scheme, whereby each neighbour is given a weight of 1, and all other polygons are given a weight of 0 (see figures above). A W weights matrix employs a row standardized weighting scheme, with each neighbour given equal weights that sum to 1 [11]. Comparatively, a C weights matrix is a globally standardized method of weighting, with all neighbours given equal weight across the entire study area [13].
+By creating a weighted neighbourhood matrix we are finding how much nearby observations deviate fron from the mean. There is a variety of weighted matrix possiblities including, inverse distance, nearest neighbour, and contiguity (ESRI, 2024). For this analysis we are usng a basic binary contiguity weighting scheme, where each neighbour is given a weight of 1, and all other polygons are given a weight of 0.
 
-Creating a weights matrix in R uses the “nb2listw” function from the “spdep” library. We can apply this function to the vri.nb variable created above, as it contains all of the neighbour links to which we want to assign weights. Additionally, if there are any polygons in our file with zero neighbour links, we still want the program to run. Therefore, we define “zero.policy” as equal to “TRUE”, which assigns weights vectors of zero length for regions with no neighbours [13]. Subsequently, we can print off our list of weights matrices (“print.listw”) in order to assess the distribution of weights for each observation (i) and its neighbours (j). The example of code below is using a weights matrix of type W. You can read more about the different styles of spatial weighting [here](https://r-spatial.github.io/spdep/reference/nb2listw.html
+To create a weights matrix in R we'll use the “nb2listw" function from the “spdep” package library. We can apply this function to the Income.nb, and French.nb variables we created above, as they contain the Queen scheme neighbourhood links to which we will assign weights. To avoid any issues in running the code caused by the existence of polygons in our weights matrix file with zero neighbour links, we define “zero.policy” as equal to “TRUE”. This will assign a weight vector of zero for regions with no neighbours. To assess the distribution of weights for each observation (i) and its neighbours (j), we can print of off our list of weights matrices using the function “print(subset_weights)”. The code below uses the binary contiguity weighted scheme type "B" we used to define our weighted neighbourhoods in the previous section.
 
 ```{r Final weights, echo=TRUE, eval=TRUE, warning=FALSE}.
 #Create Income weights matrix
-Income.lw <- nb2listw(Income.nb, zero.policy = TRUE, style = "W")
+Income.lw <- nb2listw(Income.nb, zero.policy = TRUE, style = "B")
 
 #Create French weights matrix
-French.lw <- nb2listw(French.nb, zero.policy = TRUE, style = "W")
+French.lw <- nb2listw(French.nb, zero.policy = TRUE, style = "B")
 
-#subset
+#Print of list of Income weights
 subset_weights<-head(Income.lw[["weights"]])[c(1:3)]
+print(subset_weights)
+
+#Print of list of French weights
+subset_weights<-head(French.lw[["weights]])[c.(1:3)]
 print(subset_weights)
 
 ```
 # Spatial Autocorrelation Statistics
 
 ## Global Moran’s I
+Now that we have chosen and created weight matrices for our neighbours, we can calculate the Global Moran’s I statistic. This method of spatial autocorrelation provides us with an idea of how correlated our data is over the entire data set, representing our spatial pattern at a global scale (ESRI, 2024).
 
-Now that we have determined how to choose and weight our neighbours, we can calculate the Global Moran’s I statistic. This method of testing for spatial autocorrelation looks across the entire study area for every location simultaneously [14]. The equation for this statistic is
+The equation for this statistic is:
 
 $$
 I = \frac{\sum_{i=1}^n\sum_{j=1}^nW_{i,j}(x_i - \bar{x})(x_j - \bar{x})}{(\sum_{i=1}^n\sum_{j=1}^nW_{i,j})\sum_{i=1}^n(x_i - \bar{x})^2}
 $$
 
-Here, if $x$ is the variable being assessed, $x_i$ is the variable value at a point of interest (i) and $x_j$ represents a neighbour to $x_i$ (here determined by the queen weighting scheme). The spatial weighting applied to the weighting matrix $W_{i,j}$ is multiplied by both the differences of $x_i$ and the mean value of variable $x$, and $x_j$ and the mean value of variable $x$.
-
-The denominator in this case is used to standardize our values, and therefore relatively high values of I correspond with positive spatial autocorrelation, and relatively low values of I correspond with negative spatial autocorrelation. Remember that the global Moran’s I statistic provides an indication of how spatially autocorrelated our data is over the entire dataset, thus representing a spatial pattern at the global scale [15].
-
+Here, if $x$ is the variable being assessed, $x_i$ is the variable value at a point of interest (i) and $x_j$ represents a neighbour to $x_i$ (here determined by the queen weighting scheme). The spatial weighting applied to the weighting matrix $W_{i,j}$ is multiplied by both the differences of $x_i$ and the mean value of variable $x$, and $x_j$ and the mean value of variable $x$. The denominator is used to standardize our values, which tells us that high values of I (>1) correspond with positive spatial autocorrelation, and low values of I (<1) correspond with negative spatial autocorrelation.
 
 ```{r Global Morans I, echo=TRUE, eval=TRUE, warning=FALSE}
 #Calculate Global Moran's I for Income
@@ -280,11 +287,18 @@ miFrench <- moran.test(French_noNA$PercFrench, French.lw, zero.policy = TRUE)
 mIFrench <- miFrench$estimate[[1]]
 eIFrench <- miFrench$estimate[[2]]
 varFrench <- miFrench$estimate[[3]]
+
+#Create data frame for display in table
+data2 <- data.frame(Variable = c("Income", "French Language"),
+                   I = c(round(mIIncome,2), round(mIFrench,2)),
+                   Expected = c(round(eIIncome,3), round(eIFrench,3)),
+                   Variance = c(round(varIncome,3), round(varFrench,3)))
+#Produce table 
+kable(data2, caption = paste0("Moran's I statistics for selected ", 2016, " census variables"))
 ```
+<img width="1000" alt="table2" src="https://github.com/user-attachments/assets/eb065ad5-201d-4d38-ae0e-752cea3447a2">
 
-
-Describe the results.
-
+The results for the Moran's I values for median total income and percent French knowledge speakers are 0.58 and 0.27, respectively. Since these values are greater than the expected Moran's I value of -0.004, we can infer that both variables exhibit a moderate to highly clustered distribution. The low variance values indicate that most of our observed values are relatively close to the mean. Next, we will explore the range of Moran's I values for both variables using the following code:
 
 ```{r Global Morans Range, echo=TRUE, eval=TRUE, warning=FALSE}
 #Function to calculate the range of global Moran's I
@@ -297,11 +311,17 @@ moran.range <- function(lw) {
 range <- moran.range(Income.lw)
 minRange <- range[1]
 maxRange <- range[2]
+
+#Calculate the range for the French variable
+range <- moran.range(French.lw)
+minRange2 <- range[1]
+maxRange2 <- range[2]
 ```
+<img width="1000" alt="table3" src="https://github.com/user-attachments/assets/5394b5ac-eaa2-4aa6-ad8b-a5a1c3013028">
 
-Describe what the results indicate.
+The purpose of calculating the range of Moran's I values gives us an idea of what values we might see for a perfectly dispersed and perfectly clustered distribution. Thus it can be determined that a perfeclty dispersed distribution of median total income values is -3.8 and a perfectly clustered distribution produces a Moran's I value of 7.2. For percent French knowledge speakers, the value for a perfeclty disperesed distribution is -3.9 and for 7.4 for a perfeclty clustered distribution. These ranges give us an idea of where our calculated Moran's I values fall within the entire range of values accross the dataset, allowing us to determine the pattern of spatial distribution, and the kind of spatial autocorrelation (positive or negative) that exists between the two variables.
 
-However, we can still go a step further and figure out whether these patterns are statistically significant. To do so, we can use a Z-test. Here our null hypothesis is ?, and the alternate hypothesis is ?. Using an $\alpha$ value of 0.05, if our Z-score falls above or below 1.96, we can say ?. A value greater than +1.96 would imply ?, and a value less than -1.96 would imply ?.
+To go one step further, we can determine whether or not these spatial patterns are statistically significant. To do this, we can use a Z-test. Here our null hypothesis is that median total income and percent French knowledge speakers are randomly distributed, and the alternate hypothesis is that they are not randomly distributed. Using an $\alpha$ value of 0.05 (95% confidence interval), if our Z-score falls above or below 1.96, we can determine wether we reject or accept the null hypothesis. A value greater than +1.96 would imply that our results are not randomly distributed (reject the null hypothesis), and a value less than -1.96 would imply that our results are randomly distributed (accept the null hypothesis).
 
 We can calculate a Z-test using the following code:
 
@@ -312,10 +332,11 @@ zIncome <- (mIIncome - eIIncome) / (sqrt(varIncome))
 #Calculate z-test for French
 zFrench <- (mIFrench - eIFrench) / (sqrt(varFrench))
 ```
+<img width="1000" alt="table4" src="https://github.com/user-attachments/assets/9313b532-e89c-4b5c-9a79-d7809283835e">
 
-The zscores for both variable confirm that ?
+The zscores for both variables confirm that we can reject the null hypothesis for both variables as the Z-scores are >1.96 with 95% confidence. This indicates that both variables exhibit significant clustering and strong positive spatial autocorrelation.
 
-## Local spatial autocorrelation
+## Local spatial autocorrelation (LISA)
 
 Explain local spatial autocorrelation
 
@@ -417,3 +438,13 @@ In these plots, the points with diamonds are considered statistically significan
 Provide a brief summary.
 
 ## References
+Miller, H. J. (2004). Tobler’s First Law and Spatial Analysis. Annals of the Association of American Geographers, 94(2), 284–289. http://www.jstor.org/stable/3693985 
+
+https://canadacommons-ca.ezproxy.library.uvic.ca/artifacts/1207656/statistical-portrait-of-the-french-speaking-immigrant-population-outside-quebec-1991-2011/1760761/view/?page=5 
+
+Bivand, R. (2020) spdep: spatial dependence: weighting schemes, statistics. https://CRAN.R-project.org/
+package=spdep, R package version 1.1-5
+
+https://pro.arcgis.com/en/pro-app/latest/tool-reference/spatial-statistics/h-how-spatial-autocorrelation-moran-s-i-spatial-st.htm
+
+https://pro.arcgis.com/en/pro-app/latest/tool-reference/spatial-statistics/spatial-weights.htm
