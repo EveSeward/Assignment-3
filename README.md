@@ -261,7 +261,7 @@ print(subset_weights)
 # Spatial Autocorrelation Statistics
 
 ## Global Moran’s I
-Now that we have chosen and created weight matrices for our neighbours, we can calculate the Global Moran’s I statistic. This method of spatial autocorrelation provides us with an idea of how correlated our data is over the entire data set, representing our spatial pattern at a global scale (ESRI, 2024).
+Now that we have chosen and created weight matrices for our neighbours, we can calculate the Global Moran’s I statistic. This method of spatial autocorrelation provides us with an idea of how correlated our data is over the entire data set, representing our spatial pattern at a global scale (ESRI, 2024). Where all observations (i) are compared with all of their loctions (j) to produce a global measure of variance, I, expected I, and z-score. These values and how they are calulated, are explained in the following section.
 
 The equation for this statistic is:
 
@@ -269,7 +269,7 @@ $$
 I = \frac{\sum_{i=1}^n\sum_{j=1}^nW_{i,j}(x_i - \bar{x})(x_j - \bar{x})}{(\sum_{i=1}^n\sum_{j=1}^nW_{i,j})\sum_{i=1}^n(x_i - \bar{x})^2}
 $$
 
-Here, if $x$ is the variable being assessed, $x_i$ is the variable value at a point of interest (i) and $x_j$ represents a neighbour to $x_i$ (here determined by the queen weighting scheme). The spatial weighting applied to the weighting matrix $W_{i,j}$ is multiplied by both the differences of $x_i$ and the mean value of variable $x$, and $x_j$ and the mean value of variable $x$. The denominator is used to standardize our values, which tells us that high values of I (>1) correspond with positive spatial autocorrelation, and low values of I (<1) correspond with negative spatial autocorrelation.
+Here, if $x$ is the variable being assessed, $x_i$ is the variable value at a point of interest (i) and $x_j$ represents a neighbour to $x_i$ (here determined by the queen weighting scheme). The spatial weighting applied to the weighting matrix $W_{i,j}$ is multiplied by both the differences of $x_i$ and the mean value of variable $x$, and $x_j$ and the mean value of variable $x$. The denominator is used to standardize our values, which tells us that high values of I (>1) correspond with positive spatial autocorrelation, and low values of I (<1) correspond with negative spatial autocorrelation. We'll use the function "moran.test()" from the "spedep" package library to avoid typing out the entire calculation. 
 
 ```{r Global Morans I, echo=TRUE, eval=TRUE, warning=FALSE}
 #Calculate Global Moran's I for Income
@@ -319,9 +319,9 @@ maxRange2 <- range[2]
 ```
 <img width="1000" alt="table3" src="https://github.com/user-attachments/assets/5394b5ac-eaa2-4aa6-ad8b-a5a1c3013028">
 
-The purpose of calculating the range of Moran's I values gives us an idea of what values we might see for a perfectly dispersed and perfectly clustered distribution. Thus it can be determined that a perfeclty dispersed distribution of median total income values is -3.8 and a perfectly clustered distribution produces a Moran's I value of 7.2. For percent French knowledge speakers, the value for a perfeclty disperesed distribution is -3.9 and for 7.4 for a perfeclty clustered distribution. These ranges give us an idea of where our calculated Moran's I values fall within the entire range of values accross the dataset, allowing us to determine the pattern of spatial distribution, and the kind of spatial autocorrelation (positive or negative) that exists between the two variables.
+The purpose of calculating the range of Moran's I values gives us an idea of what values we might see for perfectly dispersed and clustered distributions for both median total income an percent French knowledge speakers. These ranges give us an idea of where our calculated Moran's I values fall within the entire range of values accross the dataset, allowing us to determine the pattern of spatial distribution and the kind of spatial autocorrelation (positive or negative) that exists between the two variables.
 
-To go one step further, we can determine whether or not these spatial patterns are statistically significant. To do this, we can use a Z-test. Here our null hypothesis is that median total income and percent French knowledge speakers are randomly distributed, and the alternate hypothesis is that they are not randomly distributed. Using an $\alpha$ value of 0.05 (95% confidence interval), if our Z-score falls above or below 1.96, we can determine wether we reject or accept the null hypothesis. A value greater than +1.96 would imply that our results are not randomly distributed (reject the null hypothesis), and a value less than -1.96 would imply that our results are randomly distributed (accept the null hypothesis).
+To go one step further, we can determine whether or not these spatial patterns are statistically significant. To do this, we use the Z-test. Here our null hypothesis is that values for median total income and percent French knowledge speakers are randomly distributed, and the alternate hypothesis is that they are not randomly distributed. Using an $\alpha$ value of 0.05 (95% confidence interval), if our Z-score falls above or below 1.96, we can determine wether we reject or accept the null hypothesis. A value greater than +1.96 would imply that our results are not randomly distributed (reject the null hypothesis), and a value less than -1.96 would imply that our results are randomly distributed (accept the null hypothesis).
 
 We can calculate a Z-test using the following code:
 
@@ -331,23 +331,27 @@ zIncome <- (mIIncome - eIIncome) / (sqrt(varIncome))
 
 #Calculate z-test for French
 zFrench <- (mIFrench - eIFrench) / (sqrt(varFrench))
+
+#Create data frame for dispay in table
+data4 <- data.frame(Variable = c("Income", "French Language"),
+                   Zscore = c(round(zIncome,2), round(zFrench,2)))
+#produce table 
+kable(data4, caption = paste0("Moran's I Z-score for selected ", 2016, " census variables"))
 ```
 <img width="1000" alt="table4" src="https://github.com/user-attachments/assets/9313b532-e89c-4b5c-9a79-d7809283835e">
 
 The zscores for both variables confirm that we can reject the null hypothesis for both variables as the Z-scores are >1.96 with 95% confidence. This indicates that both variables exhibit significant clustering and strong positive spatial autocorrelation.
 
-## Local spatial autocorrelation (LISA)
+## Local Moran's I
 
-Explain local spatial autocorrelation
+Local Moran's I or LISA, is different from Global Moran's I in that it provides us with a statistic for each location with an assessment of significance (source). The main difference between the two is that instead of providing single measures of Moran's I, expected I, variance, and z-score, LISA provides us with these statistics for every single location (i) in the dataset.
 
-The calculation for Local Moran’s I has many of the same features as our global calculation, although arranged in a different way.
-
+The calculation for Local Moran’s I has many of the same features as the global calculation, although arranged differently.
 $$
 I_i = \frac{x_i - \bar{x}}{S_i^2}\sum{_{j=1}^n}W_{i,j}(x_j - \bar{x})\space \space where \space \space S_i^2 = \frac{\sum_{i=1}^n (x_i - \bar{x})^2}{n-1} 
 $$
 
-Again, instead of typing out these calculations, we can use the localmoran() function to deal with all of the messy calculations for us, as long as we input our variable and weighting scheme.
-
+Again, instead of typing out these calculations, we'll use the "localmoran()" function from the "spdep" package library and input our variables and weighting scheme.
 
 ```{r Local Morans I, echo=TRUE, eval=TRUE, warning=FALSE}
 #Calculate LISA test for Income
@@ -370,12 +374,9 @@ French_noNA$Var.Ii<- lisa.testFrench [,3]
 French_noNA$Z.Ii<- lisa.testFrench [,4]
 French_noNA$P<- lisa.testFrench [,5]
 ```
+Instead of printing out a table, we'll go back to the basic mapping template so we can visualize the results to understand what this test has done.
 
-
-Now going back to our basic mapping template we can visualize some of these results to understand what this test is doing.
-
-
-```{r MappingLocalMoransI, echo=TRUE, eval=TRUE, warning=FALSE, fig.cap="Kamloops census dissemination areas showing LISA z-scores for median total income (left) and percentage of respondants with knowledge of french (right)."}
+```{r MappingLocalMoransI, echo=TRUE, eval=TRUE, warning=FALSE, fig.cap="Kelowna census dissemination areas showing LISA z-scores for median total income (left) and percentage of respondants with knowledge of french (right)."}
 #Map LISA z-scores for Income
 map_LISA_Income <- tm_shape(Income_noNA) +
   tm_polygons(col = "Z.Ii",
@@ -409,25 +410,20 @@ tmap_arrange(map_LISA_Income, map_LISA_French, ncol = 2, nrow = 1)
 ```
 ![Rplot05](https://github.com/user-attachments/assets/1f0840c1-7bca-4874-80da-3704d3cf244c)
 
-Explain the results.
+Figure 4. Kelowna census dissemination areas showing LISA z-scores for median total income (left) and percentage of respondents with French knowledge (right).
 
-
-While these maps are great for visualizing where the data is and getting a rough idea of how many polygons are significantly positively or negatively spatially autocorrelated, it can be even more informative to graph these trends.
+While these maps are great for visualizing where the data is and getting a rough idea of how many polygons are significantly positively or negatively spatially autocorrelated, it will be even more informative to graph the Local Moran's I Z-values. This process is shown in the code below where we'll use the function "moran.plot()" from the "spdep" package libary to create scatterplote .
 
 ```{r MoransIScatter, echo=TRUE, eval=TRUE, warning=FALSE, fig.cap= "Moran's I scatter plot for median total income."}
 #Create Moran's I scatter plot for Income
 moran.plot(Income_noNA$`Median total income`, Income.lw, zero.policy=TRUE, spChk=NULL, labels=NULL, xlab="Median Total Income ($)", 
            ylab="Spatially Lagged Median Total Income ($)", quiet=NULL)
 ```
-
-
 ```{r MoransIScatter2, echo=TRUE, eval=TRUE, warning=FALSE, fig.cap= "Moran's I scatter plot for percentage of respondants with knowledge of french."}
 #Create Moran's I scatter plot for French
 moran.plot(French_noNA$PercFrench, French.lw, zero.policy=TRUE, spChk=NULL, labels=NULL, xlab="Respondants with knowledge of French (%)", 
            ylab="Spatially Lagged knowledge of French (%)", quiet=NULL)
 ```
-
-
 In these plots, the points with diamonds are considered statistically significant, and the regression line shows the overall trend. For both plots we can see that the trend shows?
 
 
@@ -448,3 +444,6 @@ package=spdep, R package version 1.1-5
 https://pro.arcgis.com/en/pro-app/latest/tool-reference/spatial-statistics/h-how-spatial-autocorrelation-moran-s-i-spatial-st.htm
 
 https://pro.arcgis.com/en/pro-app/latest/tool-reference/spatial-statistics/spatial-weights.htm
+
+https://geodacenter.github.io/workbook/6a_local_auto/lab6a.html
+
