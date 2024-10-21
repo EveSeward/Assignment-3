@@ -424,20 +424,24 @@ moran.plot(Income_noNA$`Median total income`, Income.lw, zero.policy=TRUE, spChk
 moran.plot(French_noNA$PercFrench, French.lw, zero.policy=TRUE, spChk=NULL, labels=NULL, xlab="Respondants with knowledge of French (%)", 
            ylab="Spatially Lagged knowledge of French (%)", quiet=NULL)
 ```
-In these plots, the points with diamonds are considered statistically significant, and the regression line shows the overall trend. For both plots we can see that the trend shows 
+In these plots, the points with diamonds are considered statistically significant, and the regression line shows the overall trend. For both plots we can see that the trend shows strong positive spatial autocorrelation, which tells us that there exists spatial clustering of these census variables in Kewlowna, B.C.
 
 
 ## Summary
 
-This tutorial provides a basic introduction to spatial autocorrelation in R. However, although the results of the Global and Local Moran's I tests provide valuable insights into the spatial distributions of our variables of interest, there are still oppportunites to refine our results. One key observation is that census tracts increase in size from the centre of the region, which should be considered in our weighting scheme. For example, switching from a binary contiguity scheme to "B" to a more complex scheme such as IDW could reduce the influence of distant neighbours on smaller, high population density census tracts. Additionaly, the Local Moran's I Z-score map shows significant clustering in these smaller tracts, suggesting a need to facotr in population density in future analyses. Conducting, a Global and Local Moran's I tests for population density could help to furthur refine our results. In short, suggested improvements include, experimenting with alternative weighting schemes and scaling the results to a mesure of population density.
+This tutorial provides a basic introduction to spatial autocorrelation in R and provides us with the tools to assess spatial correlation and significance. Although the results of the Global and Local Moran's I tests provide valuable insights into the spatial distributions of our variables of interest, there are still oppportunites to refine our results. One key observation is that census tracts increase in size from the centre of the region, which could intorduce boundary effects (Griffith, D.A & Amrhein, C.G). Boundary effects come into play when census tracts have fewer neighbouring data points, as is the case in our study area. This can distort our analysis by underepresenting these areas in our results and skewing significance. To address this, we could switch from a binary contiguity weighting scheme "B" to an inverse distance weighting (IDW) scheme to account for census tracts with fewer observations. Additionaly, considering population density when preforming Global and Local Moran's I tests could provide furthur insights into the observed spatial patterns of the variables assessed in this analysis, and in effect refine our results. In short, suggested improvements include, experimenting with alternative weighting schemes to account for boundary edge effects and scaling the results to a mesure of population density.
 
 ## References
+
+Bivand, R. (2020) spdep: spatial dependence: weighting schemes, statistics. https://CRAN.R-project.org/
+package=spdep, R package version 1.1-5
+
+Griffith, D.A. and Amrhein, C.G. (1983), An Evaluation of Correction Techniques for Boundary Effects in Spatial Statistical Analysis: Traditional Methods. Geographical Analysis, 15, 352-360. https://doi.org/10.1111/j.1538-4632.1983.tb00794.x
+
 Miller, H. J. (2004). Tobler’s First Law and Spatial Analysis. Annals of the Association of American Geographers, 94(2), 284–289. http://www.jstor.org/stable/3693985 
 
 https://canadacommons-ca.ezproxy.library.uvic.ca/artifacts/1207656/statistical-portrait-of-the-french-speaking-immigrant-population-outside-quebec-1991-2011/1760761/view/?page=5 
 
-Bivand, R. (2020) spdep: spatial dependence: weighting schemes, statistics. https://CRAN.R-project.org/
-package=spdep, R package version 1.1-5
 
 https://pro.arcgis.com/en/pro-app/latest/tool-reference/spatial-statistics/h-how-spatial-autocorrelation-moran-s-i-spatial-st.htm
 
