@@ -10,7 +10,7 @@ The data for this analysis was obtained from the Statistics Canada Open Governme
 ### Packages & Libraries
 
 One of the best things about using R is that we can access a variety of open-source code packages to help us execute 
-a multitude of tasks. For example, the "tmap" package library allows us to access functions to create maps that visualize our spatial data (Tennekes et. Al, 2023), "spdep" allows us to calculate spatial staistics (Bivand et.al, 2020), and "knitr" allows us to embed R code within a pdf, html, or word document output (Yihuei Xie, 2001-2024). With a better sense for how packages expand our capabilities in R, we can now begin by installing the necessary packages and calling them from our package library using the "library()" function. Whenever we install a new package in R it will be saved to our package library, so we must simply use the "library()" function to access them at anytime. Provided below are the necessary packages for spatial autocorrelation analysis:
+a multitude of tasks. For example, the "tmap" package library allows us to access functions to create maps that visualize our spatial data (Tennekes M., 2020), "spdep" allows us to calculate spatial staistics (Bivand R., 2020), and "knitr" allows us to embed R code within a pdf, html, or word document output (Yihuei X., 2024). With a better sense for how packages expand our capabilities in R, we can now begin by installing the necessary packages and calling them from our package library using the "library()" function. Whenever we install a new package in R it will be saved to our package library, so we must simply use the "library()" function to access them at anytime. Provided below are the necessary packages for spatial autocorrelation analysis:
 
 ``` {r Libraries, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
 install.packages("st")
@@ -414,7 +414,7 @@ tmap_arrange(map_LISA_Income, map_LISA_French, ncol = 2, nrow = 1)
 
 Figure 4. Kelowna census dissemination areas showing LISA z-scores for median total income (left) and percentage of respondents with French knowledge (right).
 
-The above map shows that there are census tracts in Kelowna that exhibit signifificant distribution patterns for both median total income and percent French knowledge speakers. The red polygons represent tracts that exhibit significant clustering, and the blue polygons represent area of significant disperion. Although these maps are great for visualizing which polygons in our study area are significantly positively or negatively spatially autocorrelated, it will be even more informative if we graph the Local Moran's I Z-values. This process is shown in the code below where we'll use the function "moran.plot()" from the "spdep" package libary to create scatterplot.
+The above map shows that there are census tracts in Kelowna that exhibit significant distribution patterns for both median total income and percent French knowledge speakers. The red polygons represent tracts that exhibit significant clustering, and the blue polygons represent area of significant disperion. Although these maps are great for visualizing which polygons in our study area are significantly positively or negatively spatially autocorrelated, it will be even more informative if we graph the Local Moran's I Z-values. This process is shown in the code below where we'll use the function "moran.plot()" from the "spdep" package library to create scatterplot.
 
 ```{r MoransIScatter, echo=TRUE, eval=TRUE, warning=FALSE, fig.cap= "Moran's I scatter plot for median total income."}
 #Create Moran's I scatter plot for Income
@@ -431,24 +431,28 @@ In these plots, the points with diamonds are considered statistically significan
 
 ## Summary
 
-This tutorial provides a basic introduction to spatial autocorrelation in R and provides us with the tools to assess spatial correlation and significance. Although the results of the Global and Local Moran's I tests provide valuable insights into the spatial distributions of our variables of interest, there are still oppportunites to refine our results. One key observation is that census tracts increase in size from the centre of the region, which could intorduce boundary effects (Griffith, D.A & Amrhein, C.G). Boundary effects come into play when census tracts have fewer neighbouring data points, as is the case in our study area. This can distort our analysis by underepresenting these areas in our results and skewing significance. To address this, we could switch from a binary contiguity weighting scheme "B" to an inverse distance weighting (IDW) scheme to account for census tracts with fewer observations. Additionaly, considering population density when preforming Global and Local Moran's I tests could provide furthur insights into the observed spatial patterns of the variables assessed in this analysis, and in effect refine our results. In short, suggested improvements include, experimenting with alternative weighting schemes to account for boundary edge effects and scaling the results to a mesure of population density.
+This tutorial provides a basic introduction to spatial autocorrelation in R and provides us with the tools to assess spatial correlation and significance. Although the results of the Global and Local Moran's I tests provide valuable insights into the spatial distributions of our variables of interest, there are still opportunities to refine our results. One key observation is that census tracts increase in size from the centre of the region, which could introduce boundary effects (Griffith, D.A & Amrhein, C.G, 1983). Boundary effects come into play when census tracts have fewer neighbouring data points, as is the case in our study area. This can distort our analysis by underestimating these areas in our results and skewing significance. To address this, we could switch from a binary contiguity weighting scheme "B" to an inverse distance weighting (IDW) scheme to account for census tracts with fewer observations. Additionally, considering population density when preforming Global and Local Moran's I tests could provide further insights into the observed spatial patterns of the variables assessed in this analysis, and in effect refine our results. In short, suggested improvements include, experimenting with alternative weighting schemes to account for boundary edge effects and scaling the results to a measure of population density.
 
 ## References
 
-Bivand, R. (2020) spdep: spatial dependence: weighting schemes, statistics. https://CRAN.R-project.org/
+Bivand, R. (2020). spdep: spatial dependence: weighting schemes, statistics. https://CRAN.R-project.org/
 package=spdep, R package version 1.1-5
 
-Griffith, D.A. and Amrhein, C.G. (1983), An Evaluation of Correction Techniques for Boundary Effects in Spatial Statistical Analysis: Traditional Methods. Geographical Analysis, 15, 352-360. https://doi.org/10.1111/j.1538-4632.1983.tb00794.x
+ESRI. (2024). How spatial autocorrelation (Global Moran's I) works. https://pro.arcgis.com/en/pro-app/latest/tool-reference/spatial-statistics/h-how-spatial-autocorrelation-moran-s-i-spatial-st.htm
+
+ESRI. (2024). Spatial weights. https://pro.arcgis.com/en/pro-app/latest/tool-reference/spatial-statistics/spatial-weights.htm
+
+Government of Canada. (2017). Statistical portrait of the French-speaking immigrant population outside Quebec (1911-2011). Canada.ca. https://www.canada.ca/en/immigration-refugees-citizenship/corporate/reports-statistics/research/statistical-portrait-french-speaking-immigrant-population-outside-quebec-1991-2011.html 
+
+Griffith, D.A. and Amrhein, C.G. (1983). An evaluation of correction techniques for boundary effects in spatial statistical analysis: traditional methods. Geographical Analysis, 15, 352-360. https://doi.org/10.1111/j.1538-4632.1983.tb00794.x
 
 Miller, H. J. (2004). Tobler’s First Law and Spatial Analysis. Annals of the Association of American Geographers, 94(2), 284–289. http://www.jstor.org/stable/3693985 
 
-https://canadacommons-ca.ezproxy.library.uvic.ca/artifacts/1207656/statistical-portrait-of-the-french-speaking-immigrant-population-outside-quebec-1991-2011/1760761/view/?page=5 
+Statistics Canada. (2016). Open Governement Portal. https://open.canada.ca/data/organization/statcan
 
-https://open.canada.ca/data/organization/statcan
+Tennekes, M. (2020). tmap: thematic maps. https://CRAN.R-project.org/package=tmap, R package version
+3.1
 
-https://pro.arcgis.com/en/pro-app/latest/tool-reference/spatial-statistics/h-how-spatial-autocorrelation-moran-s-i-spatial-st.htm
+Yihuei, X. (2024). knitr: elegant, flexible, and fast dynamic report generation in R. https://yihui.org/knitr/
 
-https://pro.arcgis.com/en/pro-app/latest/tool-reference/spatial-statistics/spatial-weights.htm
-
-https://geodacenter.github.io/workbook/6a_local_auto/lab6a.html
 
