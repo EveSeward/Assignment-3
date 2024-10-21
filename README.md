@@ -190,7 +190,8 @@ French.nb2 <- poly2nb(French_noNA, queen = FALSE)
 French.net2 <- nb2lines(French.nb2, coords=st_coordinates(st_centroid(French_noNA)))
 crs(French.net2) <- crs(French_noNA)
 ```
-<img width="156" alt="weights" src="https://github.com/user-attachments/assets/fcbf6529-bb84-46fc-81cd-4159ec365172">
+<img width="200" alt="weights" src="https://github.com/user-attachments/assets/fcbf6529-bb84-46fc-81cd-4159ec365172">
+
 The list above shows the first few values of the weighted matrices we just created.
 
 ### Step 9: Mapping weighted neighbourhoods
